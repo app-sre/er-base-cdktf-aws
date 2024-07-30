@@ -1,0 +1,6 @@
+# ChangeLog
+
+## 0.0.1
+
+- Terraform AWS Provider 5.60.0
+- FROM er-base-cdktf:0.0.1 (cdktf 0.20.8)
