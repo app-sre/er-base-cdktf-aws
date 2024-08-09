@@ -1,5 +1,12 @@
 # ChangeLog
 
+## 0.1.0
+
+Changed base image to er-base-cdktf:0.1.0
+
+- Terraform AWS Provider 5.60.0
+- FROM er-base-cdktf:0.1.0 (cdktf 0.20.8)
+
 ## 0.0.1
 
 - Terraform AWS Provider 5.60.0
