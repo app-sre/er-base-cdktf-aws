@@ -14,3 +14,6 @@ RUN mkdir -p ${TF_PROVIDER_AWS_PATH} && \
 WORKDIR ${HOME}
 COPY requirements.txt ./
 RUN python3 -m pip install --user -r requirements.txt
+
+COPY entrypoint.sh ./
+ENTRYPOINT [ "bash", "entrypoint.sh" ]
