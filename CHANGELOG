@@ -1,9 +1,12 @@
 # ChangeLog
 
+## 0.2.0
+
+- Included a generic entrypoint.sh  file
+
 ## 0.1.0
 
-Changed base image to er-base-cdktf:0.1.0
-
+- Changed base image to er-base-cdktf:0.1.0
 - Terraform AWS Provider 5.60.0
 - FROM er-base-cdktf:0.1.0 (cdktf 0.20.8)
 
