@@ -47,10 +47,8 @@ if [[ $ACTION == "Apply" ]]; then
         fi
     elif [[ $DRY_RUN == "False" ]]; then
         # cdktf apply isn't reliable for now, using terraform apply instead
-        $TERRAFORM_CMD plan -out plan.out
-        $TERRAFORM_CMD apply plan.out
+        $TERRAFORM_CMD apply -auto-approve
         $TERRAFORM_CMD output -json > "$OUTPUT_FILE"
-        cat "$OUTPUT_FILE"
     fi
 elif [[ $ACTION == "Destroy" ]]; then
     if [[ $DRY_RUN == "True" ]]; then
