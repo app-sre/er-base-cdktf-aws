@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 set -e
 
-# Copy AWS credentials file to HOME/.aws/ if it exists
-test -f /credentials && mkdir -p "${HOME}/.aws" && cp /credentials "${HOME}/.aws/credentials"
+# Use /credentials as AWS credentials file if it exists
+test -f /credentials && export AWS_SHARED_CREDENTIALS_FILE="/credentials"
+
+if [[ -z "$AWS_SHARED_CREDENTIALS_FILE" ]]; then
+    echo "Either AWS_SHARED_CREDENTIALS_FILE or /credentials file must be set"
+    exit 1
+fi
 
 DRY_RUN=${DRY_RUN:-"True"}
 ACTION=${ACTION:-"Apply"}
@@ -22,32 +27,32 @@ export CI=true
 export FORCE_COLOR=${FORCE_COLOR:-"0"}
 export TF_CLI_ARGS=${TF_CLI_ARGS:-"-no-color"}
 
+OUTPUT_FILE=${OUTPUT_FILE:-"/work/output.json"}
 CDKTF_OUT_DIR="$HOME/cdktf.out/stacks/CDKTF"
+TERRAFORM_CMD="terraform -chdir=$CDKTF_OUT_DIR"
 
 # CDKTF init forces the provider re-download to calculate
 # Other platform provider SHAs. USing terraform to init the configuration avoids it
 # This shuold be reevaluated in the future.
 # https://github.com/hashicorp/terraform-cdk/issues/3622
 cdktf synth
-terraform -chdir="$CDKTF_OUT_DIR" init
+$TERRAFORM_CMD init
 
 if [[ $ACTION == "Apply" ]]; then
     if [[ $DRY_RUN == "True" ]]; then
         cdktf plan --skip-synth
         if [ -f "validate_plan.py" ]; then
-            terraform -chdir="$CDKTF_OUT_DIR" show -json "$CDKTF_OUT_DIR"/plan > "$CDKTF_OUT_DIR"/plan.json
+            $TERRAFORM_CMD show -json "$CDKTF_OUT_DIR"/plan > "$CDKTF_OUT_DIR"/plan.json
             python3 validate_plan.py "$CDKTF_OUT_DIR"/plan.json
         fi
     elif [[ $DRY_RUN == "False" ]]; then
-        cdktf apply \
-            --skip-synth \
-            --auto-approve \
-            --outputs-file-include-sensitive-outputs=true \
-            --outputs-file /work/output.json
+        # cdktf apply isn't reliable for now, using terraform apply instead
+        $TERRAFORM_CMD apply -auto-approve
+        $TERRAFORM_CMD output -json > "$OUTPUT_FILE"
     fi
 elif [[ $ACTION == "Destroy" ]]; then
     if [[ $DRY_RUN == "True" ]]; then
-        terraform -chdir="$CDKTF_OUT_DIR" plan -destroy
+        $TERRAFORM_CMD plan -destroy
     elif [[ $DRY_RUN == "False" ]]; then
         cdktf destroy \
             --auto-approve
