@@ -1,7 +1,7 @@
 
 FROM quay.io/redhat-services-prod/app-sre-tenant/er-base-cdktf-main/er-base-cdktf-main:0.2.0 AS prod
 
-LABEL konflux.additional-tags="0.2.0"
+LABEL konflux.additional-tags="0.3.0"
 
 ENV TF_PROVIDER_AWS_VERSION="5.60.0"
 ENV TF_PLUGIN_CACHE="${HOME}/.terraform.d/plugin-cache"
