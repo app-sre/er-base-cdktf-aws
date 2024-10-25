@@ -22,7 +22,7 @@ if [[ $ACTION != "Apply" ]] && [[ $ACTION != "Destroy" ]]; then
     exit 1
 fi
 
-echo "Starting CDKTF:  ACTION=$ACTION with DRY_RUN=$DRY_RUN"
+echo "Starting CDKTF: ACTION=$ACTION with DRY_RUN=$DRY_RUN"
 
 # CDKTF output options
 export CI=true
