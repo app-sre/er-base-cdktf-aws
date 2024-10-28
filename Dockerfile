@@ -1,5 +1,8 @@
 
-FROM quay.io/app-sre/er-base-cdktf:0.1.0
+# Until https://issues.redhat.com/browse/RELEASE-993 is resolved, we need to use :SHA instead of :VERSION tags
+FROM quay.io/redhat-services-prod/app-sre-tenant/er-base-cdktf-main/er-base-cdktf-main:ae814ab AS prod
+
+LABEL konflux.additional-tags="0.3.0"
 
 ENV TF_PROVIDER_AWS_VERSION="5.60.0"
 ENV TF_PLUGIN_CACHE="${HOME}/.terraform.d/plugin-cache"
@@ -11,9 +14,12 @@ RUN mkdir -p ${TF_PROVIDER_AWS_PATH} && \
     unzip /tmp/package-aws-${TF_PROVIDER_AWS_VERSION}.zip -d ${TF_PROVIDER_AWS_PATH}/ && \
     rm /tmp/package-aws-${TF_PROVIDER_AWS_VERSION}.zip
 
-WORKDIR ${HOME}
 COPY requirements.txt ./
-RUN python3 -m pip install --user -r requirements.txt
+RUN uv pip install -r requirements.txt
 
 COPY entrypoint.sh ./
 ENTRYPOINT [ "bash", "entrypoint.sh" ]
+
+FROM prod AS test
+COPY Makefile ./
+RUN make test

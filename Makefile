@@ -1,21 +1,17 @@
 CONTAINER_ENGINE ?= $(shell which podman >/dev/null 2>&1 && echo podman || echo docker)
-IMAGE=quay.io/app-sre/er-base-cdktf-aws
-TAG=$(shell cat VERSION)
 
-.PHONY: all
-all: build push
+.PHONY: test
+test:
+	# test python setup
+	python -c 'import cdktf_cdktf_provider_aws'
+
+	# test entrypoint.sh exists
+	[ -f "entrypoint.sh" ]
 
 .PHONY: build
 build:
-	${CONTAINER_ENGINE} build -t ${IMAGE}:${TAG} .
+	$(CONTAINER_ENGINE) build -t er-base-cdktf-aws:test .
 
-.PHONY: push
-push:
-	${CONTAINER_ENGINE} push ${IMAGE}:${TAG}
-
-.PHONY: test
-test: build
-	@echo "No tests yet. Proceed with caution!"
-
-.PHONY: deploy
-deploy: build push
+.PHONY: dev-venv
+dev-venv:
+	uv venv && uv pip install -r requirements.txt

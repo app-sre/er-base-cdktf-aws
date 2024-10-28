@@ -22,13 +22,15 @@ if [[ $ACTION != "Apply" ]] && [[ $ACTION != "Destroy" ]]; then
     exit 1
 fi
 
+echo "Starting CDKTF: ACTION=$ACTION with DRY_RUN=$DRY_RUN"
+
 # CDKTF output options
 export CI=true
 export FORCE_COLOR=${FORCE_COLOR:-"0"}
 export TF_CLI_ARGS=${TF_CLI_ARGS:-"-no-color"}
 
 OUTPUT_FILE=${OUTPUT_FILE:-"/work/output.json"}
-CDKTF_OUT_DIR="$HOME/cdktf.out/stacks/CDKTF"
+CDKTF_OUT_DIR="$PWD/cdktf.out/stacks/CDKTF"
 TERRAFORM_CMD="terraform -chdir=$CDKTF_OUT_DIR"
 
 # CDKTF init forces the provider re-download to calculate
