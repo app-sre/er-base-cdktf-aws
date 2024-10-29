@@ -2,7 +2,7 @@
 # Until https://issues.redhat.com/browse/RELEASE-993 is resolved, we need to use :SHA instead of :VERSION tags
 FROM quay.io/redhat-services-prod/app-sre-tenant/er-base-cdktf-main/er-base-cdktf-main:ae814ab AS prod
 
-LABEL konflux.additional-tags="0.3.0"
+LABEL konflux.additional-tags="0.3.1"
 
 ENV TF_PROVIDER_AWS_VERSION="5.60.0"
 ENV TF_PLUGIN_CACHE="${HOME}/.terraform.d/plugin-cache"
