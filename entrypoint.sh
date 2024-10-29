@@ -28,21 +28,22 @@ echo "Starting CDKTF: ACTION=$ACTION with DRY_RUN=$DRY_RUN"
 export CI=true
 export FORCE_COLOR=${FORCE_COLOR:-"0"}
 export TF_CLI_ARGS=${TF_CLI_ARGS:-"-no-color"}
+export ER_OUTDIR=${ER_OUTDIR:-"/tmp/cdktf.out"}
 
 OUTPUT_FILE=${OUTPUT_FILE:-"/work/output.json"}
-CDKTF_OUT_DIR="$PWD/cdktf.out/stacks/CDKTF"
+CDKTF_OUT_DIR="$ER_OUTDIR/stacks/CDKTF"
 TERRAFORM_CMD="terraform -chdir=$CDKTF_OUT_DIR"
 
 # CDKTF init forces the provider re-download to calculate
 # Other platform provider SHAs. USing terraform to init the configuration avoids it
 # This shuold be reevaluated in the future.
 # https://github.com/hashicorp/terraform-cdk/issues/3622
-cdktf synth
+cdktf synth --output "$ER_OUTDIR"
 $TERRAFORM_CMD init
 
 if [[ $ACTION == "Apply" ]]; then
     if [[ $DRY_RUN == "True" ]]; then
-        cdktf plan --skip-synth
+        cdktf plan --skip-synth --output "$ER_OUTDIR"
         if [ -f "validate_plan.py" ]; then
             $TERRAFORM_CMD show -json "$CDKTF_OUT_DIR"/plan > "$CDKTF_OUT_DIR"/plan.json
             python3 validate_plan.py "$CDKTF_OUT_DIR"/plan.json
@@ -57,6 +58,7 @@ elif [[ $ACTION == "Destroy" ]]; then
         $TERRAFORM_CMD plan -destroy
     elif [[ $DRY_RUN == "False" ]]; then
         cdktf destroy \
-            --auto-approve
+            --auto-approve \
+            --output "$ER_OUTDIR"
     fi
 fi
